@@ -1,1 +1,236 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    text-align: center;
+    background-color: #343a40;
+    color: #fff;
+    padding: 15px 0;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 2.2rem;
+}
+
+/* Container Layout */
+.container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* Left Column: Add Expense Form */
+#left-column {
+    flex: 1;
+    min-width: 300px;
+}
+
+#add-expense {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+#add-expense h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #007bff;
+}
+
+form label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+form button {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+form button:hover {
+    background-color: #218838;
+}
+
+/* Right Column: Financial Overview Sections */
+#right-column {
+    flex: 1;
+    min-width: 300px;
+}
+
+#right-column h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #007bff;
+}
+
+section {
+    background-color: #ffffff;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+section h3 {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #343a40;
+}
+
+section p {
+    font-size: 1.2rem;
+    color: #333;
+}
+
+section form label {
+    font-weight: bold;
+    margin: 10px 0 5px;
+    display: block;
+}
+
+section form input,
+section form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+section form button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+section form button:hover {
+    background-color: #0056b3;
+}
+
+/* Report Area Layout */
+#report-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+#report-area div {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#report-area h3 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+#report-area p {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #343a40;
+}
+
+/* Expense List Table */
+#expense-list {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+#expense-list h2 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: #007bff;
+}
+
+#expense-list table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#expense-list th,
+#expense-list td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    font-size: 1rem;
+}
+
+#expense-list th {
+    background-color: #f4f6f8;
+    font-weight: bold;
+}
+
+#expense-list button {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+#expense-list button:hover {
+    background-color: #c82333;
+}
+img{
+    /* margin-top: 40px; */
+    width: 800px;
+    height: 400px;
+    object-fit: cover;
+    /* move the image to the right a little*/
+    margin-left: 120px;
+}
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    #report-area {
+        grid-template-columns: 1fr;
+    }
+}
 
