@@ -1,1 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js for graphs -->
+</head>
+<body>
+
+    <header>
+        <h1>Personal Expense Tracker</h1>
+    </header>
+    <div class="container">
+        <!-- Left Side: Add Expense Form -->
+        <div id="left-column">
+            <section id="add-expense">
+                <h2>Add a New Expense</h2>
+                <form action="/add_expense" method="POST">
+                    <label for="date">Date:</label>
+                    <input type="date" id="date" name="date" required>
+
+                    <label for="category">Category:</label>
+                    <select id="category" name="category" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="Food">Food</option>
+                        <option value="Transport">Transport</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Health">Health</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <label for="description">Description:</label>
+                    <input type="text" id="description" name="description">
+
+                    <label for="amount">Amount:</label>
+                    <input type="number" id="amount" name="amount" step="0.01" required>
+
+                    <button type="submit">Add Expense</button>
+                </form>
+            </section>
+
+            <!-- add image here from the link -->
+            <img src="https://www.moneyfit.org/wp-content/uploads/2023/02/Growing-money-e1676571728909.jpeg" alt="Image of a shopping cart"> 
+        </div>
+
+        <!-- Right Side: Budget, Income, Bills, and Savings -->
+        <div id="right-column">
+            <h2>Financial Overview</h2>
+
+            <!-- Form for Inputting Income -->
+            <section id="income">
+                <h3>Set Monthly Income</h3>
+                <form action="/set_income" method="POST">
+                    <label for="income_amount">Income Amount:</label>
+                    <input type="number" id="income_amount" name="income_amount" step="0.01" required>
+                    <button type="submit">Save Income</button>
+                </form>
+            </section>
+
+            <!-- Form for Inputting Budget -->
+            <section id="budget">
+                <h3>Set Monthly Budget</h3>
+                <form action="/set_budget" method="POST">
+                    <label for="budget_amount">Budget Amount:</label>
+                    <input type="number" id="budget_amount" name="budget_amount" step="0.01" required>
+                    <button type="submit">Save Budget</button>
+                </form>
+            </section>
+
+            <!-- Form for Inputting Bills -->
+            <section id="bills">
+                <h3>Set Monthly Bills</h3>
+                <form action="/add_bill" method="POST">
+                    <label for="bill_category">Bill Category:</label>
+                    <select id="bill_category" name="bill_category" required>
+                        <option value="" disabled selected>Select a bill category</option>
+                        <option value="Rent">Rent</option>
+                        <option value="Utilities">Utilities</option>
+                        <option value="Maintenance">Maintenance</option>
+                        <option value="Insurance">Insurance</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <label for="bill_amount">Bill Amount:</label>
+                    <input type="number" id="bill_amount" name="bill_amount" step="0.01" required>
+                    
+                    <button type="submit">Save Bill</button>
+                </form>
+            </section>
+
+            <!-- Section to display remaining savings after bills -->
+            <section id="remaining-savings">
+                <h3>Remaining Savings</h3>
+                <p><strong>$0.00</strong> (Remaining savings)</p>  <!-- This will be updated dynamically -->
+            </section>
+        </div>
+    </div>
+    <!-- Monthly Report Section -->
+    <div id="report-area">
+        <div id="monthly-total">
+            <h3>Monthly Total</h3>
+            <p><strong>$<span id="monthly-total-amount"></span></strong></p>
+        </div>
+
+        <div id="category-breakdown">
+            <h3>Category Breakdown</h3>
+            <ul id="category-list"></ul>
+        </div>
+
+        <div id="top-spending-category">
+            <h3>Top Spending Category</h3>
+            <p id="top-category"></p>
+        </div>
+
+        <div id="expense-count">
+            <h3>Number of Expenses</h3>
+            <p><strong><span id="expense-count-number"></span></strong></p>
+        </div>
+    </div>
+
+    <!-- Expense List Table -->
+    <section id="expense-list">
+        <h2>Expense History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="expenseTableBody">
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense[1] }}</td>
+                    <td>{{ expense[2] }}</td>
+                    <td>{{ expense[3] }}</td>
+                    <td>{{ expense[4] }}</td>
+                    <td><button onclick="deleteExpense({{ expense[0] }})">Delete</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const addExpenseForm = document.querySelector("#add-expense form");
+            const categorySelect = document.getElementById("category");
+            const customCategoryField = document.getElementById("custom-category");
+            const customCategoryLabel = document.querySelector("label[for='custom-category']");
+            
+            // Set default date to today's date
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+            // Toggle custom category input visibility
+            categorySelect.addEventListener("change", function () {
+                if (categorySelect.value === "Other") {
+                    customCategoryField.style.display = "block";
+                    customCategoryLabel.style.display = "block";
+                } else {
+                    customCategoryField.style.display = "none";
+                    customCategoryLabel.style.display = "none";
+                }
+            });
+
+            // Validate amount before form submission
+            addExpenseForm.addEventListener("submit", function (event) {
+                const amountInput = document.getElementById("amount");
+                if (amountInput.value <= 0) {
+                    alert("Amount must be positive.");
+                    event.preventDefault(); // Prevent submission if invalid
+                }
+            });
+
+            // Fetch and display monthly report data
+            function fetchMonthlyReport() {
+                fetch('/monthly_report')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Update monthly total expense
+                        document.getElementById('monthly-total-amount').textContent = parseFloat(data.total_expense).toFixed(2);
+        
+                        // Populate category breakdown
+                        const categoryList = document.getElementById('category-list');
+                        categoryList.innerHTML = '';
+                        data.category_breakdown.forEach(category => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `${category.category}: $${parseFloat(category.amount).toFixed(2)} (${parseFloat(category.percentage).toFixed(2)}%)`;
+                            categoryList.appendChild(listItem);
+                        });
+        
+                        // Display top spending category
+                        const topCategoryElement = document.getElementById('top-category');
+                        if (data.top_spending_category) {
+                            topCategoryElement.innerHTML = `${data.top_spending_category.category}: $${parseFloat(data.top_spending_category.amount).toFixed(2)}`;
+                        } else {
+                            topCategoryElement.innerHTML = 'No spending this month.';
+                        }
+        
+                        // Update expense count
+                        document.getElementById('expense-count-number').textContent = data.expense_count;
+                    })
+                    .catch(error => console.error("Error fetching monthly report:", error));
+            }
+
+            // Load expenses dynamically
+            function loadExpenses() {
+                fetch("/expenses")
+                    .then(response => response.json())
+                    .then(data => {
+                        const tableBody = document.getElementById("expenseTableBody");
+                        tableBody.innerHTML = ""; // Clear table
+
+                        data.forEach(expense => {
+                            const row = document.createElement("tr");
+                            row.innerHTML = `
+                                <td>${expense.date}</td>
+                                <td>${expense.category}</td>
+                                <td>${expense.description}</td>
+                                <td>${parseFloat(expense.amount).toFixed(2)}</td>
+                                <td><button onclick="deleteExpense(${expense.id})">Delete</button></td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => console.error("Error loading expenses:", error));
+            }
+
+            // Delete an expense by ID and reload expenses on success
+            window.deleteExpense = function (id) {
+                fetch(`/delete/${id}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            alert("Expense deleted successfully.");
+                            loadExpenses(); // Reload expenses
+                        } else {
+                            alert("Failed to delete expense.");
+                        }
+                    });
+            };
+
+            // Fetch and display data on load
+            fetchMonthlyReport();
+            loadExpenses();
+        });
+    </script>
+</body>
+</html>
 
